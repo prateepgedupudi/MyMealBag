@@ -1,0 +1,7 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <item name="ic_menu_favorite" type="drawable">@drawable/ic_menu_favorite</item>
+    <item name="ic_menu_ord_history" type="drawable">@drawable/ic_menu_ord_history</item>
+    <item name="ic_menu_payment_history" type="drawable">@drawable/ic_menu_payment_history</item>
+    <item name="ic_menu_faq" type="drawable">@drawable/ic_menu_faq</item>
+    <item name="ic_menu_contact" type="drawable">@drawable/ic_menu_contact</item>
+</resources>
