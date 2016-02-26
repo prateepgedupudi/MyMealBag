@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import info.prateep.android.mymealbag.login.SignupActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
 
             }
         });

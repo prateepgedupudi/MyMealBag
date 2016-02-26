@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".login.LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -34,7 +34,7 @@
                 android:value="info.prateep.android.mymealbag.MainActivity" />
         </activity>
         <activity
-            android:name=".SignupActivity"
+            android:name=".login.SignupActivity"
             android:label="@string/title_activity_signup"
             android:parentActivityName=".MainActivity">
             <meta-data

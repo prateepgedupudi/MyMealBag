@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import info.prateep.android.mymealbag.login.LoginActivity;
+
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 

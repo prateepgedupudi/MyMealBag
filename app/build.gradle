@@ -18,6 +18,13 @@ android {
         }
     }
 
+    /* This code loads up a value from your gradle.properties file. For ex. root URL.
+     */
+
+    buildTypes.each {
+        it.buildConfigField 'String', 'UNIQUE_FIREBASE_ROOT_URL', UniqueFirebaseRootUrl
+    }
+
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE-FIREBASE.txt'
