@@ -84,6 +84,13 @@ public class SignupActivity extends AppCompatActivity  {
             cancel = true;
         }
 
+        // Check for a password required
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -100,39 +107,38 @@ public class SignupActivity extends AppCompatActivity  {
         mAuthProgressDialog.setCancelable(false);
         mAuthProgressDialog.show();
 
+        //Perform firebase signup call only after passing all local validation on the fields.
+        if(!cancel){
+            //TODO perform firebase sign up call here.
+            mFirebaseRef.createUser(email,password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+                @Override
+                public void onSuccess(Map<String, Object> stringObjectMap) {
+                    mAuthProgressDialog.dismiss();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
 
-        //TODO perform firebase sign up call here.
-        mFirebaseRef.createUser(email,password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-            @Override
-            public void onSuccess(Map<String, Object> stringObjectMap) {
-                mAuthProgressDialog.dismiss();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onError(FirebaseError firebaseError) {
-                mAuthProgressDialog.dismiss();
-                //TODO Set the error to the fields based on the provided firebaseError
-                mEmailView.setError(firebaseError.getMessage());
-                focusView = mEmailView;
-                cancel = true;
+                @Override
+                public void onError(FirebaseError firebaseError) {
+                    mAuthProgressDialog.dismiss();
+                    //TODO Set the error to the fields based on the provided firebaseError
+                    mEmailView.setError(firebaseError.getMessage());
+                    focusView = mEmailView;
+                    cancel = true;
                 /* Error occurred, log the error and dismiss the progress dialog */
-                Log.d(LOG_TAG, firebaseError.getMessage());
+                    Log.d(LOG_TAG, firebaseError.getMessage());
 
-            }
-        });
+                }
+            });
 
 
-
+        }
+        // There was an error; don't attempt sign up and focus the first
+        // form field with an error.
         if (cancel) {
-            // There was an error; don't attempt sign up and focus the first
-            // form field with an error.
+            mAuthProgressDialog.dismiss();
+            cancel = false;
             focusView.requestFocus();
-        } else {
-            //TODO Add Intent to loginActivity
-            //mAuthTask = new UserLoginTask(email, password);
-            //mAuthTask.execute((Void) null);
         }
     }
 

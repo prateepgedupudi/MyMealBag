@@ -67,6 +67,13 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+        Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        mEmailSignUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),SignupActivity.class));
+            }
+        });
 
         mLoginFormView = findViewById(R.id.login_form);
     }
@@ -100,6 +107,13 @@ public class LoginActivity extends AppCompatActivity {
             cancel = true;
         }
 
+        // Check for a password required
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -116,35 +130,38 @@ public class LoginActivity extends AppCompatActivity {
         mAuthProgressDialog.setCancelable(false);
         mAuthProgressDialog.show();
 
-        mFirebaseRef.authWithPassword(email,password, new Firebase.AuthResultHandler() {
-            @Override
-            public void onAuthenticated(AuthData authData) {
-                //TODO Add authData to Shared Preferences so that we can send on every firebase request from any activity
-                mAuthProgressDialog.dismiss();
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                startActivity(intent);
-            }
+        //Perform firebase login call only after passing all local validation on the fields.
+        if(!cancel){
+            mFirebaseRef.authWithPassword(email,password, new Firebase.AuthResultHandler() {
+                @Override
+                public void onAuthenticated(AuthData authData) {
+                    //TODO Add authData to Shared Preferences so that we can send on every firebase request from any activity
+                    mAuthProgressDialog.dismiss();
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivity(intent);
+                }
 
-            @Override
-            public void onAuthenticationError(FirebaseError firebaseError) {
-                mAuthProgressDialog.dismiss();
-                mEmailView.setError(firebaseError.getMessage());
-                focusView = mEmailView;
-                cancel = true;
-                Log.e(LOG_TAG, firebaseError.getMessage());
+                @Override
+                public void onAuthenticationError(FirebaseError firebaseError) {
+                    mAuthProgressDialog.dismiss();
+                    mEmailView.setError(firebaseError.getMessage());
+                    focusView = mEmailView;
+                    cancel = true;
+                    Log.e(LOG_TAG, firebaseError.getMessage());
 
-            }
-        });
+                }
+            });
+
+        }
 
 
+
+        // There was an error; don't attempt sign up and focus the first
+        // form field with an error.
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
+            mAuthProgressDialog.dismiss();
+            cancel = false;
             focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-
         }
     }
 
