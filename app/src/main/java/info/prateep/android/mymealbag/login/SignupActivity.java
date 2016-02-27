@@ -18,6 +18,7 @@ import com.firebase.client.FirebaseError;
 import java.util.Map;
 
 import info.prateep.android.mymealbag.R;
+import info.prateep.android.mymealbag.model.User;
 import info.prateep.android.mymealbag.util.Constants;
 
 /**
@@ -27,6 +28,8 @@ public class SignupActivity extends AppCompatActivity  {
     private static final String LOG_TAG = SignupActivity.class.getSimpleName();
 
     // UI references.
+    private String email,password,name,mobile;
+    private EditText mNameView, mMobileView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mSignUpFormView;
@@ -42,6 +45,8 @@ public class SignupActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_signup);
 
         // Set up the login form.
+        mNameView = (EditText)findViewById(R.id.sign_up_name);
+        mMobileView = (EditText)findViewById(R.id.sign_up_mobile);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.sign_up_email);
         mPasswordView = (EditText) findViewById(R.id.sign_up_password);
         /**
@@ -72,8 +77,10 @@ public class SignupActivity extends AppCompatActivity  {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        name = mNameView.getText().toString();
+        mobile = mMobileView.getText().toString();
+        email = mEmailView.getText().toString();
+        password = mPasswordView.getText().toString();
 
 
 
@@ -81,6 +88,26 @@ public class SignupActivity extends AppCompatActivity  {
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid mobile, if the user entered one.
+        if (!TextUtils.isEmpty(mobile) && !isPhoneValid(mobile)) {
+            mMobileView.setError(getString(R.string.error_invalid_mobile));
+            focusView = mMobileView;
+            cancel = true;
+        }
+
+        // Check for a name required
+        if (TextUtils.isEmpty(name)) {
+            mNameView.setError(getString(R.string.error_field_required));
+            focusView = mNameView;
+            cancel = true;
+        }
+        // Check for a mobile required
+        if (TextUtils.isEmpty(mobile)) {
+            mMobileView.setError(getString(R.string.error_field_required));
+            focusView = mMobileView;
             cancel = true;
         }
 
@@ -113,10 +140,15 @@ public class SignupActivity extends AppCompatActivity  {
             mFirebaseRef.createUser(email,password, new Firebase.ValueResultHandler<Map<String, Object>>() {
                 @Override
                 public void onSuccess(Map<String, Object> stringObjectMap) {
+                    //Actual firebase /users insertion here.
+                    createUserInFireBase((String)stringObjectMap.get("uid"));
+                    //Hide the progess dialog
                     mAuthProgressDialog.dismiss();
+                    //Create new intent and forward to LoginActivity
                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                     startActivity(intent);
                 }
+
 
                 @Override
                 public void onError(FirebaseError firebaseError) {
@@ -142,14 +174,24 @@ public class SignupActivity extends AppCompatActivity  {
         }
     }
 
-    private boolean isEmailValid(String email) {
+    private boolean isPhoneValid(String phoneNum) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return phoneNum.length() == 10;
+    }
+    private boolean isEmailValid(String emailAdd) {
+        //TODO: Replace this with your own logic
+        return emailAdd.contains("@");
     }
 
-    private boolean isPasswordValid(String password) {
+    private boolean isPasswordValid(String pwd) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return pwd.length() > 4;
+    }
+
+    private void createUserInFireBase(final String uid) {
+        final Firebase userLocation = new Firebase(Constants.FIREBASE_URL_USERS).child(uid);
+        User user = new User(uid, name, email, mobile);
+        userLocation.setValue(user);
     }
 
 
