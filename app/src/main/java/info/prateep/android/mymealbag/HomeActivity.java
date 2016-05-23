@@ -59,7 +59,7 @@ public class HomeActivity extends AppCompatActivity
                         R.layout.grid_item_forecast, // The name of the layout ID.
                         R.id.grid_item_forecast_textview, // The ID of the textview to populate.
                         weekMealForecast);
-        GridView gridView= (GridView)findViewById(R.id.gridview_forecast);
+        GridView gridView = (GridView) findViewById(R.id.gridview_forecast);
         gridView.setAdapter(mMealForecastAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -70,9 +70,6 @@ public class HomeActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-
-
-
 
 
     }
@@ -125,7 +122,7 @@ public class HomeActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_contact) {
 
-        }else if (id == R.id.nav_sign_out) {
+        } else if (id == R.id.nav_sign_out) {
             //TODO clear logged in user details in shared preferences
 
             //Redirect page to LoginActivity

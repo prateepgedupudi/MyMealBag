@@ -3,6 +3,7 @@ package info.prateep.android.mymealbag.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,32 +13,38 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-
-import java.util.Map;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import info.prateep.android.mymealbag.R;
 import info.prateep.android.mymealbag.model.User;
-import info.prateep.android.mymealbag.util.Constants;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class SignupActivity extends AppCompatActivity  {
+public class SignupActivity extends AppCompatActivity {
     private static final String LOG_TAG = SignupActivity.class.getSimpleName();
-
+    // Firebase database
+    FirebaseDatabase database;
+    DatabaseReference myRef;
     // UI references.
-    private String email,password,name,mobile;
+    private String email, password, name, mobile;
     private EditText mNameView, mMobileView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mSignUpFormView;
-    private Firebase mFirebaseRef;
     private ProgressDialog mAuthProgressDialog;
     private boolean cancel = false;
     private View focusView = null;
-
+    // Firebase instance variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +52,13 @@ public class SignupActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_signup);
 
         // Set up the login form.
-        mNameView = (EditText)findViewById(R.id.sign_up_name);
-        mMobileView = (EditText)findViewById(R.id.sign_up_mobile);
+        mNameView = (EditText) findViewById(R.id.sign_up_name);
+        mMobileView = (EditText) findViewById(R.id.sign_up_mobile);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.sign_up_email);
         mPasswordView = (EditText) findViewById(R.id.sign_up_password);
-        /**
-         * Create Firebase references
-         */
-        mFirebaseRef = new Firebase(Constants.FIREBASE_URL);
+
+        //Init Firebase Authentication
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
         mEmailSignUpButton.setOnClickListener(new OnClickListener() {
@@ -63,6 +69,28 @@ public class SignupActivity extends AppCompatActivity  {
         });
 
         mSignUpFormView = findViewById(R.id.sign_up_form);
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(LOG_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    //Create User Data
+                    createUserInFireBase(user.getUid().toString());
+                    //Hide the progess dialog
+                    mAuthProgressDialog.dismiss();
+                    //Create new intent and forward to LoginActivity
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                } else {
+                    // User is signed out
+                    Log.d(LOG_TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
     }
 
     /**
@@ -81,7 +109,6 @@ public class SignupActivity extends AppCompatActivity  {
         mobile = mMobileView.getText().toString();
         email = mEmailView.getText().toString();
         password = mPasswordView.getText().toString();
-
 
 
         // Check for a valid password, if the user entered one.
@@ -135,34 +162,28 @@ public class SignupActivity extends AppCompatActivity  {
         mAuthProgressDialog.show();
 
         //Perform firebase signup call only after passing all local validation on the fields.
-        if(!cancel){
+        if (!cancel) {
             //TODO perform firebase sign up call here.
-            mFirebaseRef.createUser(email,password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-                @Override
-                public void onSuccess(Map<String, Object> stringObjectMap) {
-                    //Actual firebase /users insertion here.
-                    createUserInFireBase((String)stringObjectMap.get("uid"));
-                    //Hide the progess dialog
-                    mAuthProgressDialog.dismiss();
-                    //Create new intent and forward to LoginActivity
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
-                }
 
+            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d(LOG_TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
 
-                @Override
-                public void onError(FirebaseError firebaseError) {
-                    mAuthProgressDialog.dismiss();
-                    //TODO Set the error to the fields based on the provided firebaseError
-                    mEmailView.setError(firebaseError.getMessage());
-                    focusView = mEmailView;
-                    cancel = true;
-                /* Error occurred, log the error and dismiss the progress dialog */
-                    Log.d(LOG_TAG, firebaseError.getMessage());
-
-                }
-            });
-
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                mAuthProgressDialog.dismiss();
+                                //TODO Set the error to the fields based on the provided firebaseError
+                                mEmailView.setError("Authentication failed");
+                                focusView = mEmailView;
+                                cancel = true;
+                            }
+                        }
+                    });
+            mFirebaseAuth.addAuthStateListener(mAuthListener);
 
         }
         // There was an error; don't attempt sign up and focus the first
@@ -178,6 +199,7 @@ public class SignupActivity extends AppCompatActivity  {
         //TODO: Replace this with your own logic
         return phoneNum.length() == 10;
     }
+
     private boolean isEmailValid(String emailAdd) {
         //TODO: Replace this with your own logic
         return emailAdd.contains("@");
@@ -189,11 +211,11 @@ public class SignupActivity extends AppCompatActivity  {
     }
 
     private void createUserInFireBase(final String uid) {
-        final Firebase userLocation = new Firebase(Constants.FIREBASE_URL_USERS).child(uid);
+        database = FirebaseDatabase.getInstance();
         User user = new User(uid, name, email, mobile);
-        userLocation.setValue(user);
+        myRef = database.getReference("users");
+        myRef.child(uid).setValue(user);
     }
-
 
 }
 

@@ -3,6 +3,7 @@ package info.prateep.android.mymealbag.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,13 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import info.prateep.android.mymealbag.HomeActivity;
 import info.prateep.android.mymealbag.R;
-import info.prateep.android.mymealbag.util.Constants;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -33,10 +36,14 @@ public class LoginActivity extends AppCompatActivity {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mLoginFormView;
-    private Firebase mFirebaseRef;
     private ProgressDialog mAuthProgressDialog;
     private boolean cancel = false;
     private View focusView = null;
+
+    // Firebase instance variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +51,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
-        /**
-         * Create Firebase references
-         */
-        mFirebaseRef = new Firebase(Constants.FIREBASE_URL);
+        //Init Firebase Authentication
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -71,17 +77,32 @@ public class LoginActivity extends AppCompatActivity {
         mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),SignupActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
+
+        //Init Firebase Authentication Listener
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                mFirebaseUser = firebaseAuth.getCurrentUser();
+                if (mFirebaseUser != null) {
+                    // User is signed in
+                    Log.d(LOG_TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
+                    //Dismiss progress dialog
+                    mAuthProgressDialog.dismiss();
+                    //Go to the HomeActivity
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivity(intent);
+                } else {
+                    // User is signed out
+                    Log.d(LOG_TAG, "onAuthStateChanged:signed_out");
+                }
+            }
+        };
     }
-
-
-
-
-
 
 
     /**
@@ -91,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void attemptLogin() {
 
-       // Reset errors.
+        // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -131,29 +152,29 @@ public class LoginActivity extends AppCompatActivity {
         mAuthProgressDialog.show();
 
         //Perform firebase login call only after passing all local validation on the fields.
-        if(!cancel){
-            mFirebaseRef.authWithPassword(email,password, new Firebase.AuthResultHandler() {
-                @Override
-                public void onAuthenticated(AuthData authData) {
-                    //TODO Add authData to Shared Preferences so that we can send on every firebase request from any activity
-                    mAuthProgressDialog.dismiss();
-                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                    startActivity(intent);
-                }
+        if (!cancel) {
+            mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d(LOG_TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                @Override
-                public void onAuthenticationError(FirebaseError firebaseError) {
-                    mAuthProgressDialog.dismiss();
-                    mEmailView.setError(firebaseError.getMessage());
-                    focusView = mEmailView;
-                    cancel = true;
-                    Log.e(LOG_TAG, firebaseError.getMessage());
-
-                }
-            });
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                mAuthProgressDialog.dismiss();
+                                mEmailView.setError("Authentication failed");
+                                focusView = mEmailView;
+                                cancel = true;
+                                Log.w(LOG_TAG, "signInWithEmail", task.getException());
+                            }
+                        }
+                    });
+            //Adding the mAuthListener, so that it will call onAuthStateChanged() based on tsk successful
+            mFirebaseAuth.addAuthStateListener(mAuthListener);
 
         }
-
 
 
         // There was an error; don't attempt sign up and focus the first

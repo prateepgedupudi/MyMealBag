@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "188526779712",
+    "firebase_url": "https://my-meal-bag.firebaseio.com",
+    "project_id": "my-meal-bag",
+    "storage_bucket": "my-meal-bag.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188526779712:android:1cb8bd360442b85f",
+        "android_client_info": {
+          "package_name": "info.prateep.android.mymealbag"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "188526779712-l4prmsj9muvm486mknqo6af1jr3of03v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.prateep.android.mymealbag",
+            "certificate_hash": "A264978E6D4BB6E28F4D8359157B9776ED0F4C62"
+          }
+        },
+        {
+          "client_id": "188526779712-9rg197ma1l8uolma6uvs467lp1g42fh7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzpNGnQLXeTMLhNfhAZl3lOoO510Htxhs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "188526779712-9rg197ma1l8uolma6uvs467lp1g42fh7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

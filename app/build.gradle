@@ -37,6 +37,12 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
-    /* Firebase SDK */
-    compile 'com.firebase:firebase-client-android:2.5.2+'
+    /* Firebase Auth*/
+    compile 'com.google.firebase:firebase-auth:9.0.0'
+    /* Firebase Database*/
+    compile 'com.google.firebase:firebase-database:9.0.0'
+    /* Firebase Cloud Messaging*/
+    compile 'com.google.firebase:firebase-messaging:9.0.0'
 }
+/* Includes Firebase Analytics by default */
+apply plugin: 'com.google.gms.google-services'
