@@ -19,22 +19,32 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import info.prateep.android.mymealbag.login.LoginActivity;
+import info.prateep.android.mymealbag.model.User;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
-    String userName;
     String photoUrl;
-    String userEmail;
+    TextView usrEmailView;
+    TextView usrNameView;
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+
+    // Firebase database
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +75,15 @@ public class HomeActivity extends AppCompatActivity
         }
         //Get the user details
         else {
-            userName = mFirebaseUser.getDisplayName();
-            userEmail = mFirebaseUser.getEmail();
             Log.d(LOG_TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
             if (mFirebaseUser.getPhotoUrl() != null) {
                 photoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
             //We can not directly get headerLayout items from Android Support Library 23.1.1 onwards. Below is the way to get those.
             View headerLayout = navigationView.getHeaderView(0);
-            TextView usrEmailView = (TextView)headerLayout.findViewById(R.id.userEmail);
-            usrEmailView.setText(userEmail);
+            usrEmailView = (TextView)headerLayout.findViewById(R.id.userEmail);
+            usrNameView = (TextView)headerLayout.findViewById(R.id.userName);
+            this.getUserInFireBase(mFirebaseUser.getUid());
             //TODO Write seperate method to Get User object from firebase after getting user authentication by Uid. Which should give user complete name, email, photo url ect...
         }
 
@@ -167,5 +176,28 @@ public class HomeActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void getUserInFireBase(final String uid) {
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users");
+        myRef.child(uid).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user value
+                        User user = dataSnapshot.getValue(User.class);
+                        if(user!=null){
+                            usrEmailView.setText(user.getEmail());
+                            usrNameView.setText(user.getName()+" M:"+user.getMobile());
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(LOG_TAG, "getUser:onCancelled", databaseError.toException());
+                    }
+                });
     }
 }
