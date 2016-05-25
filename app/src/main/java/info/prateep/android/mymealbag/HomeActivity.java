@@ -42,6 +42,15 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -62,23 +71,12 @@ public class HomeActivity extends AppCompatActivity
             if (mFirebaseUser.getPhotoUrl() != null) {
                 photoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
-/*
-            TextView usrNameView = (TextView)findViewById(R.id.userName);
-            TextView usrEmailView = (TextView)findViewById(R.id.userEmail);
-            usrNameView.setText(userName);
+            //We can not directly get headerLayout items from Android Support Library 23.1.1 onwards. Below is the way to get those.
+            View headerLayout = navigationView.getHeaderView(0);
+            TextView usrEmailView = (TextView)headerLayout.findViewById(R.id.userEmail);
             usrEmailView.setText(userEmail);
-*/
+            //TODO Write seperate method to Get User object from firebase after getting user authentication by Uid. Which should give user complete name, email, photo url ect...
         }
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         //Below code is for dummy. Feel free to refactor
         // Create some dummy data for the ListView.  Here's a sample weekly forecast
