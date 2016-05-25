@@ -8,12 +8,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +28,13 @@ import info.prateep.android.mymealbag.login.LoginActivity;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String LOG_TAG = HomeActivity.class.getSimpleName();
+    String userName;
+    String photoUrl;
+    String userEmail;
+    // Firebase instance variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +42,33 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        //Get currently logged in user
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        //If user is not logged in then open Login Page
+        if (mFirebaseUser == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+        //Get the user details
+        else {
+            userName = mFirebaseUser.getDisplayName();
+            userEmail = mFirebaseUser.getEmail();
+            Log.d(LOG_TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
+            if (mFirebaseUser.getPhotoUrl() != null) {
+                photoUrl = mFirebaseUser.getPhotoUrl().toString();
+            }
+/*
+            TextView usrNameView = (TextView)findViewById(R.id.userName);
+            TextView usrEmailView = (TextView)findViewById(R.id.userEmail);
+            usrNameView.setText(userName);
+            usrEmailView.setText(userEmail);
+*/
+        }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -110,26 +149,23 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_favorite) {
-            // Handle the camera action
-        } else if (id == R.id.nav_order_history) {
-
-        } else if (id == R.id.nav_payment_history) {
-
-        } else if (id == R.id.nav_faq) {
-
-        } else if (id == R.id.nav_contact) {
-
-        } else if (id == R.id.nav_sign_out) {
-            //TODO clear logged in user details in shared preferences
-
-            //Redirect page to LoginActivity
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-            return true;
+        switch (item.getItemId()) {
+            case R.id.nav_favorite:
+                //Handle fovorite
+                break;
+            case R.id.nav_order_history:
+                break;
+            case R.id.nav_faq:
+                break;
+            case R.id.nav_contact:
+                break;
+            case R.id.nav_sign_out:
+                //TODO clear logged in user details in shared preferences
+                //Redirect page to LoginActivity
+                mFirebaseAuth.signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                return true;
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
