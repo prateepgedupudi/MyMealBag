@@ -88,7 +88,7 @@ public class SignupActivity extends AppCompatActivity {
                     // User is signed out
                     Log.d(LOG_TAG, "onAuthStateChanged:signed_out");
                 }
-                // ...
+
             }
         };
     }
@@ -163,7 +163,7 @@ public class SignupActivity extends AppCompatActivity {
 
         //Perform firebase signup call only after passing all local validation on the fields.
         if (!cancel) {
-            //TODO perform firebase sign up call here.
+            //Perform firebase sign up call here.
 
             mFirebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
