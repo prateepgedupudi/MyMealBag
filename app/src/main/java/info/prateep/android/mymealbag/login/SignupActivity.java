@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Map;
+
 import info.prateep.android.mymealbag.R;
 import info.prateep.android.mymealbag.model.User;
 
@@ -212,7 +214,12 @@ public class SignupActivity extends AppCompatActivity {
 
     private void createUserInFireBase(final String uid) {
         database = FirebaseDatabase.getInstance();
-        User user = new User(uid, name, email, mobile);
+        User user = new User();
+        user.setUid(uid);
+        user.setName(name);
+        user.setEmail(email);
+        user.setMobile(mobile);
+
         myRef = database.getReference("users");
         myRef.child(uid).setValue(user);
     }
