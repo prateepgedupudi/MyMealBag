@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isPasswordValid(String password) {
