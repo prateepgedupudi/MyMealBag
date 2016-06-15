@@ -3,6 +3,15 @@ jdk: oraclejdk8
 # Use the Travis Container-Based Infrastructure
 sudo: false
 
+notifications:
+  email:
+    recipients:
+      - pallintibala@gmail.com
+      - aswinbakshi@gmail.com
+      - prateep.gedupudi@gmail.com
+    on_failure: always # [always|never|change] default: always
+
+
 cache:
   directories:
     - ${TRAVIS_BUILD_DIR}/gradle/caches/
