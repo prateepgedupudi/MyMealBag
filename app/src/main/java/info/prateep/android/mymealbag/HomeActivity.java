@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import info.prateep.android.mymealbag.login.LoginActivity;
 import info.prateep.android.mymealbag.model.User;
@@ -38,6 +39,7 @@ public class HomeActivity extends AppCompatActivity
     String photoUrl;
     TextView usrEmailView;
     TextView usrNameView;
+    Map<String,List<String>> myItems;
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -89,7 +91,20 @@ public class HomeActivity extends AppCompatActivity
 
         //Below code is for dummy. Feel free to refactor
         // Create some dummy data for the ListView.  Here's a sample weekly forecast
-        String[] data = {
+        List<String> data;
+        if(myItems!=null){
+            for (Map.Entry<String,List<String>> entry:myItems.entrySet()
+                 ) {
+               StringBuffer day = new StringBuffer(entry.getKey()).append(":");
+                List<String> items=entry.getValue();
+                for (String item:items
+                     ) {
+                    day.append(item).append("/n");
+                }
+
+            }
+        }
+        /*String[] data = {
                 "MON - 15 FEB16 - Rice,Daal,Curry",
                 "TUE - 16 FEB16 - Choose Meal",
                 "WED - 17 FEB16 - Choose Meal",
@@ -97,8 +112,10 @@ public class HomeActivity extends AppCompatActivity
                 "FRI - 19 FEB16 - Choose Meal",
                 "SAT - 20 FEB16 - Choose Meal",
                 "SUN - 21 FEB16 - Choose Meal",
-        };
-        List<String> weekMealForecast = new ArrayList<String>(Arrays.asList(data));
+        };*/
+
+        List<String> weekMealForecast = new ArrayList<String>(7);
+
         final ArrayAdapter<String> mMealForecastAdapter =
                 new ArrayAdapter<String>(
                         getApplicationContext(), // The current context (this activity)
@@ -190,6 +207,7 @@ public class HomeActivity extends AppCompatActivity
                         if(user!=null){
                             usrEmailView.setText(user.getEmail());
                             usrNameView.setText(user.getName()+" M:"+user.getMobile());
+                            myItems=user.getItems();
                         }
 
                     }
