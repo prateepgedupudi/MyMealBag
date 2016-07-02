@@ -58,4 +58,4 @@ before_script:
   #- android-wait-for-emulator
 
 script:
-  - ./gradlew clean :app:assembleDebug
+  - ./gradlew build :app:assembleRelease
