@@ -180,8 +180,9 @@ public class HomeActivity extends AppCompatActivity
 
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    String foreCast = (String) mMealForecastAdapter.getItem(position);
+                                    String foreCast = (String) mMealForecastAdapter.getItemKey(position);
                                     Intent intent = new Intent(getApplicationContext(),ChefActivity.class);
+                                    intent.putExtra("day",foreCast);
                                     startActivity(intent);
                                 }
                             });

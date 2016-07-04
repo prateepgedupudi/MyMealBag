@@ -18,6 +18,7 @@ public class ChefActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chef);
+        String foreCastDay = getIntent().getExtras().getString("day");
 
         //Below code is dummy. Feel free to refactor
         String[] data = {
@@ -29,6 +30,7 @@ public class ChefActivity extends AppCompatActivity {
                 "Andhra Special By Maha",
                 "Chettinadu Style By Prateep"
         };
+        data[0]=foreCastDay;
         List<String> weekCheffForecast = new ArrayList<String>(Arrays.asList(data));
         // The ArrayAdapter will take data from a source and
         // use it to populate the ListView it's attached to.

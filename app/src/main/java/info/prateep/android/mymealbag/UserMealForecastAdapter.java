@@ -73,6 +73,10 @@ public class UserMealForecastAdapter extends BaseAdapter {
         return mData.get(mKeys[position]);
     }
 
+    public Object getItemKey(int position) {
+        return mKeys[position];
+    }
+
     /**
      * Get the row id associated with the specified position in the list.
      *
