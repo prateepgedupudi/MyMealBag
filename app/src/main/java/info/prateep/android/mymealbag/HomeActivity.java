@@ -159,7 +159,7 @@ public class HomeActivity extends AppCompatActivity
     private void getUserInFireBase(final String uid) {
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("users");
-        myRef.child(uid).addListenerForSingleValueEvent(
+        myRef.child(uid).addValueEventListener(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
