@@ -18,7 +18,7 @@ public class ChefActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chef);
-        String foreCastDay = getIntent().getExtras().getString("day");
+        final String foreCastDay = getIntent().getExtras().getString("day");
 
         //Below code is dummy. Feel free to refactor
         String[] data = {
@@ -51,6 +51,7 @@ public class ChefActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String forecast = mForecastAdapter.getItem(position);
                 Intent intent = new Intent(getApplicationContext(), MealActivity.class);
+                intent.putExtra("day",foreCastDay);
                 startActivity(intent);
             }
         });
