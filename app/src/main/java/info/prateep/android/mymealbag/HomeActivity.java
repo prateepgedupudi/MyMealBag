@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +39,8 @@ public class HomeActivity extends AppCompatActivity
     String photoUrl;
     TextView usrEmailView;
     TextView usrNameView;
-    Map<String,List<String>> myItems;
+    ListView listView;
+    Map<String, String> myItems;
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -85,54 +86,14 @@ public class HomeActivity extends AppCompatActivity
             View headerLayout = navigationView.getHeaderView(0);
             usrEmailView = (TextView)headerLayout.findViewById(R.id.userEmail);
             usrNameView = (TextView)headerLayout.findViewById(R.id.userName);
+            listView = (ListView)findViewById(R.id.listview_forecast);
             this.getUserInFireBase(mFirebaseUser.getUid());
             //TODO Write seperate method to Get User object from firebase after getting user authentication by Uid. Which should give user complete name, email, photo url ect...
         }
 
-        //Below code is for dummy. Feel free to refactor
-        // Create some dummy data for the ListView.  Here's a sample weekly forecast
-        List<String> data;
-        if(myItems!=null){
-            for (Map.Entry<String,List<String>> entry:myItems.entrySet()
-                 ) {
-               StringBuffer day = new StringBuffer(entry.getKey()).append(":");
-                List<String> items=entry.getValue();
-                for (String item:items
-                     ) {
-                    day.append(item).append("/n");
-                }
 
-            }
-        }
-        /*String[] data = {
-                "MON - 15 FEB16 - Rice,Daal,Curry",
-                "TUE - 16 FEB16 - Choose Meal",
-                "WED - 17 FEB16 - Choose Meal",
-                "THU - 18 FEB16 - Choose Meal",
-                "FRI - 19 FEB16 - Choose Meal",
-                "SAT - 20 FEB16 - Choose Meal",
-                "SUN - 21 FEB16 - Choose Meal",
-        };*/
 
-        List<String> weekMealForecast = new ArrayList<String>(7);
 
-        final ArrayAdapter<String> mMealForecastAdapter =
-                new ArrayAdapter<String>(
-                        getApplicationContext(), // The current context (this activity)
-                        R.layout.grid_item_forecast, // The name of the layout ID.
-                        R.id.grid_item_forecast_textview, // The ID of the textview to populate.
-                        weekMealForecast);
-        GridView gridView = (GridView) findViewById(R.id.gridview_forecast);
-        gridView.setAdapter(mMealForecastAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                String forecast = mMealForecastAdapter.getItem(position);
-                Intent intent = new Intent(getApplicationContext(), ChefActivity.class);
-                startActivity(intent);
-            }
-        });
 
 
     }
@@ -208,6 +169,22 @@ public class HomeActivity extends AppCompatActivity
                             usrEmailView.setText(user.getEmail());
                             usrNameView.setText(user.getName()+" M:"+user.getMobile());
                             myItems=user.getItems();
+
+                            Map<String,String> myDummyData = new HashMap<String, String>();
+                            if(myItems!=null){
+                                myDummyData = myItems;
+                            }
+                            final UserMealForecastAdapter mMealForecastAdapter = new UserMealForecastAdapter(myDummyData);
+                            listView.setAdapter(mMealForecastAdapter);
+                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    String foreCast = (String) mMealForecastAdapter.getItem(position);
+                                    Intent intent = new Intent(getApplicationContext(),ChefActivity.class);
+                                    startActivity(intent);
+                                }
+                            });
                         }
 
                     }

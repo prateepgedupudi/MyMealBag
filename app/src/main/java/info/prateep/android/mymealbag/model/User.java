@@ -12,7 +12,7 @@ public class User {
     private String email;
     private String mobile;
     private String isAdmin;
-    private Map<String,List<String>> items;
+    private Map<String,String> items;
 
 
     public User() {
@@ -38,7 +38,7 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-    public void setItems(Map<String, List<String>> items) {
+    public void setItems(Map<String, String> items) {
         this.items = items;
     }
 
@@ -62,7 +62,7 @@ public class User {
         return isAdmin;
     }
 
-    public Map<String,List<String>> getItems() {
+    public Map<String,String> getItems() {
         return items;
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/user_meal_forevast_list_item_day_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/user_meal_forevast_list_item_date_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceSmall"/>
+
+    <TextView
+        android:id="@+id/user_meal_forevast_list_item_meal_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceSmall"/>
+</LinearLayout>
