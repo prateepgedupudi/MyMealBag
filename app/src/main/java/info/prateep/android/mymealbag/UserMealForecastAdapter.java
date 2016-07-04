@@ -38,6 +38,7 @@ public class UserMealForecastAdapter extends BaseAdapter {
         //Sync the data with fire base data
         for (String currentKey : data.keySet()) {
             try {
+                //Show meal data for only current and future dates up to seven days
                 if (df.parse(currentKey).compareTo(calendar.getTime()) >= 0) {
                     mData.put(currentKey, data.get(currentKey));
                 }
