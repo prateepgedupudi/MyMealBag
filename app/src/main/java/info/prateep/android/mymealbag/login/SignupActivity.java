@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,11 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import info.prateep.android.mymealbag.R;
@@ -226,19 +222,15 @@ public class SignupActivity extends AppCompatActivity {
         user.setName(name);
         user.setEmail(email);
         user.setMobile(mobile);
-        user.setIsAdmin("Y");
+        //user.setIsAdmin("Y");
 
-        Map myItems = new HashMap();
+        Map<String, String> myItems = new HashMap<String, String>();
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String formattedDate = df.format(c.getTime());
 
-        List mondayList=new ArrayList();
-        mondayList.add("Sample Item by Chef Name");
-        mondayList.add("Sample Item2 by Chef Name");
-
-        myItems.put(formattedDate,mondayList);
+        myItems.put(formattedDate,"Sample Item by Chef Name");
 
         user.setItems(myItems);
 
